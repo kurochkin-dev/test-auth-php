@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\ProductOption;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Faker\Generator as Faker;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductOption>
+ * @extends Factory<ProductOption>
  */
 class ProductOptionFactory extends Factory
 {
@@ -21,7 +22,9 @@ class ProductOptionFactory extends Factory
     public function definition(): array
     {
         return [
+            'product_id' => Product::factory(),
             'name' => $this->faker->word,
+            'value' => $this->faker->word,
         ];
     }
 }

@@ -2,37 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Api\IndexProductRequest;
+use App\Http\Requests\Api\StoreProductRequest;
 use App\Models\Product;
 use App\Models\ProductOption;
-use App\Models\ProductProperty;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(IndexProductRequest $request)
     {
-        // Валидация параметров запроса
-        $validator = Validator::make($request->all(), [
-            'properties.*' => 'array',
-            'quantity' => 'integer|min:0',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors()->first(),
-            ], 400);
-        }
-
-        $query = Product::with(['properties' => function ($query) {
-            $query->select(['id', 'product_id', 'property_name', 'property_value']);
+        $query = Product::with(['options' => function ($query) {
+            $query->select(['id', 'product_id', 'name', 'value']);
         }]);
 
-        $propertyFilters = $request->input('properties', []);
-        foreach ($propertyFilters as $property_name => $property_values) {
-            $query->orWhereHas('properties', function ($query) use ($property_name, $property_values) {
-                $query->whereIn('property_name', [$property_name])
-                    ->whereIn('property_value', $property_values);
+        $optionsFilters = $request->input('options', []);
+        foreach ($optionsFilters as $options_name => $options_values) {
+            $query->orWhereHas('options', function ($query) use ($options_name, $options_values) {
+                $query->whereIn('name', [$options_name])
+                    ->whereIn('value', $options_values);
             });
         }
 
@@ -42,30 +30,14 @@ class ProductController extends Controller
             $query->where('quantity', '>=', $quantityFilter);
         }
 
-        $products = $query->paginate(40);
+        $products = $query->paginate(10);
 
         return response()->json($products);
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'options' => 'required|array',
-            'options.*.name' => 'required|string|max:255',
-            'options.*.value' => 'required|string|max:255',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors()->first(),
-            ], 400);
-        }
-
-        // Create the product
         $product = Product::create([
             'name' => $request->input('name'),
             'price' => $request->input('price'),
@@ -78,12 +50,15 @@ class ProductController extends Controller
             $product->options()->save($option);
         }
 
-        return response()->json($product);
+        return response()->json($product, 201);
     }
 
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with(['option' => function ($query) {
+            $query->select(['id', 'product_id', 'name', 'value']);
+        }])->findOrFail($id);
+
         return response()->json($product, 200);
     }
 

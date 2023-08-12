@@ -38,6 +38,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Создание товара
     Route::post('products', [ProductController::class, 'store']);
 
-    // Страница с товарами
-    Route::get('products-page', [ProductController::class, 'show']);
+    // Товар
+    Route::get('products/{id}', [ProductController::class, 'show']);
 });

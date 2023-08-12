@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ProductOption;
 use Illuminate\Database\Seeder;
-use App\Models\ProductProperty;
 
 class ProductPropertySeeder extends Seeder
 {
@@ -13,6 +12,6 @@ class ProductPropertySeeder extends Seeder
      */
     public function run(): void
     {
-        ProductProperty::factory()->count(50)->create(); // Создаем 50 случайных записей
+        ProductOption::factory()->count(50)->create();
     }
 }

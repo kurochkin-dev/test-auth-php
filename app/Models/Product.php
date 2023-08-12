@@ -25,14 +25,6 @@ class Product extends Model
     }
 
     /**
-     * Get the properties for the product.
-     */
-    public function properties()
-    {
-        return $this->hasMany(ProductProperty::class);
-    }
-
-    /**
      * Scope a query to only include products with the specified options.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -56,7 +48,7 @@ class Product extends Model
      * @param array $attributes
      * @return Product
      */
-    public static function createProduct(array $attributes)
+    public static function create(array $attributes)
     {
         $product = new static($attributes);
         $product->save();

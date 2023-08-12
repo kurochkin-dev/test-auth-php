@@ -13,20 +13,17 @@ class ProductsTableSeeder extends Seeder
 {
     public function run()
     {
-        // Создаем 50 товаров
         $products = Product::factory()->count(50)->create();
 
-        // Создаем опции товаров
         $productOptions = ProductOption::factory()->count(10)->create();
 
-        // Связываем товары с опциями
         $products->each(function ($product) use ($productOptions) {
             $options = $productOptions->random(rand(1, 5))->pluck('id');
-            foreach ($options as $option) {
-                DB::table('product_option_values')->insert([
+            foreach ($options as $optionName) {
+                DB::table('product_options')->insert([
                     'product_id' => $product->id,
-                    'product_option_id' => $option,
-                    'value' => 'Random Value', // Замените на случайное значение, если необходимо
+                    'name' => $optionName,
+                    'value' => 'Random Value',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
